@@ -1,0 +1,40 @@
+async function getMatchResults(league) {
+    const apiKey = '1830365c6511439cb3de8458d74b36a0';
+    const apiUrl = `https://api.football-data.org/v2/competitions/${league}/matches`;
+    
+    try {
+        const response = await fetch(apiUrl, {
+            headers: {
+                'X-Auth-Token': apiKey
+            }
+        });
+        const data = await response.json();
+        
+        if (data && data.matches) {
+            const matchResults = data.matches.filter(match => match.status === 'FINISHED');
+            return matchResults;
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.error('Error fetching match results:', error);
+        return null;
+    }
+}
+
+async function displayMatchResults(league) {
+    const matchResults = await getMatchResults(league);
+    
+    if (matchResults && matchResults.length > 0) {
+        console.log('Match Results:');
+        matchResults.forEach(match => {
+            console.log(`${match.homeTeam.name} ${match.score.fullTime.homeTeam} - ${match.awayTeam.name} ${match.score.fullTime.awayTeam}`);
+        });
+    } else {
+        console.log('No match results found.');
+    }
+}
+
+// Beispielverwendung:
+const leagueCode = 'PL'; // Premier League
+displayMatchResults(leagueCode);
